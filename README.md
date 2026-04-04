@@ -76,7 +76,7 @@ The shifted key hard prior fixes the symmetric memory matrix issue of linear att
 
 This symmetry issue doesn't apply to softmax attention, which retains all previous keys to query against.
 
-We can also think of the shifted key as copy/paste - after I see x, think of y — which does seem extremely limiting since associations are restricted to neighboring tokens.
+We can also think of the shifted key as copy/paste - after I see x, think of y - which does seem extremely limiting since associations are restricted to neighboring tokens.
 However, empirically at 100M parameter sizes it still seems to work, perhaps suggesting that for linear attention models, the q, k projections are mostly about:
 1. Learning to break the symmetry in the memory matrix
 2. Forming good orthogonal keys to fully utilize the key space
@@ -85,7 +85,7 @@ However, empirically at 100M parameter sizes it still seems to work, perhaps sug
 It seems that the raw hidden states serve these responsibilities well enough or better.
 
 ## Experiments
-Disclaimer — all models are decently undertrained. Curves are fit on the last 80% of training to avoid too much early training influence. Sequence length is 2048, vocab of 1024.
+Disclaimer - all models are decently undertrained. Curves are fit on the last 80% of training to avoid too much early training influence. Sequence length is 2048, vocab of 1024.
 
 ### 18M Scale Testing
 We train a baseline 17.9M parameter Gated Delta Net and 14.7M Shifted Key Gated Delta Net models for 30M tokens, batch size 4 on coding examples (The Stack). Layers and model dimensions are the same besides removing QK.
@@ -106,9 +106,9 @@ The shifted key model maintains a small lead despite ~15% fewer parameters, as w
 ![100M GDN Training Loss](eval_results/loss_curves_gdn_100M.png)
 
 Lastly, the shifted key model seems to utilize its keys "better" for storing information across its layers with three metrics:
-1. Effective rank — how many different keys are being stored.
-2. Avg pairwise cosine — how close and "jumbled" keys are for clean retrieval.
-3. Condition number — how well the keys as a whole use the dimensional "storage" space.
+1. Effective rank - how many different keys are being stored.
+2. Avg pairwise cosine - how close and "jumbled" keys are for clean retrieval.
+3. Condition number - how well the keys as a whole use the dimensional "storage" space.
 
 ![Key Quality Comparison](eval_results/key_quality.png)
 
