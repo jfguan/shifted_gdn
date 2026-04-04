@@ -11,13 +11,13 @@ import numpy as np
 # OUT_PATH = "eval_results/loss_curves_gdn_18M.png"
 # MODELS = [
 #     ("histories/gdn_18M_the_stack.jsonl", "Gated Delta Net 17.9M"),
-#     ("histories/gdn_ts_18M_the_stack.jsonl", "Shifted Key Gated Delta Net 14.7M"),
+#     ("histories/shifted_gdn_18M_the_stack.jsonl", "Shifted Key Gated Delta Net 14.7M"),
 # ]
 
 OUT_PATH = "eval_results/loss_curves_gdn_100M.png"
 MODELS = [
     ("histories/gdn_100M_the_stack.jsonl", "Gated Delta Net 105.2M"),
-    ("histories/gdn_ts_100M_the_stack.jsonl", "Shifted Key Gated Delta Net 86.2M"),
+    ("histories/shifted_gdn_100M_the_stack.jsonl", "Shifted Key Gated Delta Net 86.2M"),
 ]
 
 # OUT_PATH = "eval_results/loss_curves_transformer_18M.png"

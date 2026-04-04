@@ -52,7 +52,7 @@ GDN_18M = ModelConfig(
     d_model=512, n_layers=6, d_conv=4, expand=2, chunk_size=64, num_heads=4,
 )
 
-GDN_TS_18M = ModelConfig(
+SHIFTED_GDN_18M = ModelConfig(
     name="gdn_tokenshift", model=ModelType.GDN_TOKENSHIFT,
     d_model=512, n_layers=6, d_conv=4, expand=2, chunk_size=64, num_heads=4,
 )
@@ -74,7 +74,7 @@ GDN_100M = ModelConfig(
     d_model=1024, n_layers=9, d_conv=4, expand=2, chunk_size=64, num_heads=8,
 )
 
-GDN_TS_100M = ModelConfig(
+SHIFTED_GDN_100M = ModelConfig(
     name="gdn_tokenshift", model=ModelType.GDN_TOKENSHIFT,
     d_model=1024, n_layers=9, d_conv=4, expand=2, chunk_size=64, num_heads=8,
 )

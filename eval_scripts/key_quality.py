@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from train.configs import GDN_100M, GDN_TS_100M
+from train.configs import GDN_100M, SHIFTED_GDN_100M
 from dataclasses import replace
 from models import build_model
 from data.loader import DatasetName
@@ -17,7 +17,7 @@ from data import load_dataset, DataLoader
 OUT_PATH = "eval_results/key_quality.png"
 MODELS = [
     ("Gated Delta Net 105M", GDN_100M, "checkpoints/gdn_100M_the_stack.pt", "#d62728"),
-    ("Shifted Key Gated Delta Net 86M", GDN_TS_100M, "checkpoints/gdn_ts_100M_the_stack.pt", "#1f77b4"),
+    ("Shifted Key Gated Delta Net 86M", SHIFTED_GDN_100M, "checkpoints/shifted_gdn_100M_the_stack.pt", "#1f77b4"),
 ]
 
 

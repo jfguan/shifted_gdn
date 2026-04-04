@@ -21,9 +21,9 @@ import train.configs as C
 
 MODELS = {
     "gdn_18M": C.GDN_18M,
-    "gdn_ts_18M": C.GDN_TS_18M,
+    "shifted_gdn_18M": C.SHIFTED_GDN_18M,
     "gdn_100M": C.GDN_100M,
-    "gdn_ts_100M": C.GDN_TS_100M,
+    "shifted_gdn_100M": C.SHIFTED_GDN_100M,
     "transformer_18M": C.TRANSFORMER_18M,
     "transformer_ts_18M": C.TRANSFORMER_TS_18M,
 }
