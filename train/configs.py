@@ -19,22 +19,16 @@ class ModelConfig:
     n_layers: int
     d_conv: int
     expand: int
-    d_state: int
     chunk_size: int
-
+    num_heads: int
     vocab_size: int = 0  # set from dataset at runtime
-    num_heads: int | None = None
+
+    # compat with old checkpoints
+    d_state: int = 16
+    delta_layers: list[int] | None = None
     delta_num_heads: int | None = None
     delta_num_matrices: int = 1
-    delta_layers: list[int] | None = None
     swa_window: int = 256
-
-    def __post_init__(self):
-        for attr in ("head_dim", "delta_head_dim", "memory_alpha", "neg_eigenvalues", "no_memory_layers"):
-            if hasattr(self, attr):
-                delattr(self, attr)
-        if isinstance(self.delta_layers, str):
-            self.delta_layers = [int(x) for x in self.delta_layers.split(",")]
 
 
 @dataclass
@@ -49,41 +43,40 @@ class TrainConfig:
     eval_interval: int
     ckpt_interval: int
     max_steps_per_run: int | None = None
-    compile: bool = False
 
 
 # -- 18M models --
 
 GDN_18M = ModelConfig(
     name="gdn", model=ModelType.GDN,
-    d_model=512, n_layers=6, d_conv=4, expand=2, d_state=16, chunk_size=64, num_heads=4,
+    d_model=512, n_layers=6, d_conv=4, expand=2, chunk_size=64, num_heads=4,
 )
 
 GDN_TS_18M = ModelConfig(
     name="gdn_tokenshift", model=ModelType.GDN_TOKENSHIFT,
-    d_model=512, n_layers=6, d_conv=4, expand=2, d_state=16, chunk_size=64, num_heads=4,
+    d_model=512, n_layers=6, d_conv=4, expand=2, chunk_size=64, num_heads=4,
 )
 
 TRANSFORMER_18M = ModelConfig(
     name="transformer", model=ModelType.TRANSFORMER,
-    d_model=512, n_layers=8, d_conv=4, expand=2, d_state=16, chunk_size=64, num_heads=4,
+    d_model=512, n_layers=8, d_conv=4, expand=2, chunk_size=64, num_heads=4,
 )
 
 TRANSFORMER_TS_18M = ModelConfig(
     name="transformer_ts", model=ModelType.TRANSFORMER_TS,
-    d_model=512, n_layers=8, d_conv=4, expand=2, d_state=16, chunk_size=64, num_heads=4,
+    d_model=512, n_layers=8, d_conv=4, expand=2, chunk_size=64, num_heads=4,
 )
 
 # -- 100M models --
 
 GDN_100M = ModelConfig(
     name="gdn", model=ModelType.GDN,
-    d_model=1024, n_layers=9, d_conv=4, expand=2, d_state=16, chunk_size=64, num_heads=8,
+    d_model=1024, n_layers=9, d_conv=4, expand=2, chunk_size=64, num_heads=8,
 )
 
 GDN_TS_100M = ModelConfig(
     name="gdn_tokenshift", model=ModelType.GDN_TOKENSHIFT,
-    d_model=1024, n_layers=9, d_conv=4, expand=2, d_state=16, chunk_size=64, num_heads=8,
+    d_model=1024, n_layers=9, d_conv=4, expand=2, chunk_size=64, num_heads=8,
 )
 
 # -- Training configs --
