@@ -1,9 +1,6 @@
-data/pg19/
 data/the_stack/
 data/__pycache__/
 eval_results/*.pt
-# checkpoints tracked via git-lfs
-histories/
 .DS_Store
 __pycache__/
 .venv/
