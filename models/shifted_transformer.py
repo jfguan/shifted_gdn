@@ -1,7 +1,7 @@
-"""Standard transformer baseline.
+"""Shifted-key transformer baseline.
 
-Causal attention with QK projections + RoPE and SwiGLU MLP.
-No conv, no delta memory — pure transformer.
+K uses previous position's projection (like SWA). No QK projections,
+no conv, no delta memory — pure transformer with token shift.
 """
 
 import torch
@@ -22,8 +22,8 @@ class RMSNorm(nn.Module):
         return x * torch.rsqrt(x.float().pow(2).mean(-1, keepdim=True) + self.eps).to(x.dtype) * self.weight
 
 
-class Attention(nn.Module):
-    """Multi-head causal attention with RoPE and QK projections."""
+class ShiftedAttention(nn.Module):
+    """Multi-head causal attention with RoPE. No QK projections — token shift only."""
 
     def __init__(self, d_model: int, num_heads: int = 4, max_seq_len: int = 8192):
         super().__init__()
@@ -31,8 +31,6 @@ class Attention(nn.Module):
         self.num_heads = num_heads
         self.head_dim = d_model // num_heads
 
-        self.q_proj = nn.Linear(d_model, d_model, bias=False)
-        self.k_proj = nn.Linear(d_model, d_model, bias=False)
         self.v_proj = nn.Linear(d_model, d_model, bias=False)
         self.out_proj = nn.Linear(d_model, d_model, bias=False)
 
@@ -54,19 +52,19 @@ class Attention(nn.Module):
         B, T, D = x.shape
         H, d = self.num_heads, self.head_dim
 
-        q = self._rope(self.q_proj(x).view(B, T, H, d).transpose(1, 2))
-        k = self._rope(self.k_proj(x).view(B, T, H, d).transpose(1, 2))
+        q = self._rope(x.view(B, T, H, d).transpose(1, 2))
+        k = self._rope(F.pad(x[:, :-1], (0, 0, 1, 0)).view(B, T, H, d).transpose(1, 2))
         v = self.v_proj(x).view(B, T, H, d).transpose(1, 2)
 
         out = F.scaled_dot_product_attention(q, k, v, is_causal=True)
         return self.out_proj(out.transpose(1, 2).reshape(B, T, D))
 
 
-class TransformerLayer(nn.Module):
+class ShiftedTransformerLayer(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.norm_attn = RMSNorm(cfg.d_model)
-        self.attn = Attention(cfg.d_model, num_heads=cfg.num_heads)
+        self.attn = ShiftedAttention(cfg.d_model, num_heads=cfg.num_heads)
         self.norm_mlp = RMSNorm(cfg.d_model)
         self.mlp = GatedMLP(cfg.d_model, expand=cfg.expand)
 
@@ -76,13 +74,13 @@ class TransformerLayer(nn.Module):
         return x + self.mlp(normed, self.mlp.project_up(normed))
 
 
-class Transformer(nn.Module):
+class ShiftedTransformer(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.cfg = cfg
         self.embedding = nn.Embedding(cfg.vocab_size, cfg.d_model)
         self.layers = nn.ModuleList([
-            TransformerLayer(cfg)
+            ShiftedTransformerLayer(cfg)
             for _ in range(cfg.n_layers)
         ])
         self.norm = RMSNorm(cfg.d_model)

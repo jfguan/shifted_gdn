@@ -198,7 +198,7 @@ class GDNTokenShiftLayer(nn.Module):
         return x + self.mlp(normed, self.mlp.project_up(normed)), delta_st
 
 
-class GDNTokenShift(nn.Module):
+class ShiftedGDN(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.cfg = cfg

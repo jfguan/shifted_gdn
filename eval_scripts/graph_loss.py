@@ -14,17 +14,17 @@ import numpy as np
 #     ("histories/shifted_gdn_18M_the_stack.jsonl", "Shifted Key Gated Delta Net 14.7M"),
 # ]
 
-OUT_PATH = "eval_results/loss_curves_gdn_100M.png"
-MODELS = [
-    ("histories/gdn_100M_the_stack.jsonl", "Gated Delta Net 105.2M"),
-    ("histories/shifted_gdn_100M_the_stack.jsonl", "Shifted Key Gated Delta Net 86.2M"),
-]
-
 # OUT_PATH = "eval_results/loss_curves_transformer_18M.png"
 # MODELS = [
 #     ("histories/transformer_18M_the_stack.jsonl", "Transformer 21.5M"),
 #     ("histories/transformer_ts_18M_the_stack.jsonl", "Shifted Key Transformer 17.3M"),
 # ]
+
+OUT_PATH = "eval_results/loss_curves_gdn_100M.png"
+MODELS = [
+    ("histories/gdn_100M_the_stack.jsonl", "Gated Delta Net 105.2M"),
+    ("histories/shifted_gdn_100M_the_stack.jsonl", "Shifted Key Gated Delta Net 86.2M"),
+]
 
 COLORS = ["#d62728", "#1f77b4"]
 

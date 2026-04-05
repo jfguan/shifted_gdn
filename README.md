@@ -12,7 +12,7 @@ We also show the same concept does not apply to softmax attention. Concept was d
 The shift is similar to RWKV token lerp, but removes Q/K projections completely.
 
 ## Attention Quick Review
-Attention uses x_t (hidden state at position t) to generate the key k_t and value v_t vectors, one per previous token, as well as the current query vector q_t.
+Attention uses x_t (hidden state at position t) to generate the key k_t and value v_t vectors per token, as well as the current query vector q_t.
 
 In a simplified example with word tokens, we need to predict the blank:
 
@@ -40,9 +40,9 @@ cons
 Mechanism explanation:
 With two k, v vectors, first take the outer product v⊗k, written also as (v · k^T).
 Afterwards, multiplying v⊗k by k again, we get v · (k^T @ k) = v · ‖k‖².
-Note, v⊗k is a matrix. Multiplying the matrix k returns v (scaled to k).
+Note, v⊗k is a matrix. Multiplying the matrix k returns v (scaled by k).
 
-We store each token's k,v in a fixed-size matrix M by doing M += v⊗k, continually ading new k, v pairs to memory.
+We store each token's k,v in a fixed-size matrix M by doing M += v⊗k, continually adding new k, v pairs to memory.
 However, because M is fixed size, eventually all the keys start to overlap, so if two keys were similar, querying will return a combination of the two corresponding values. We can think of M is a lossy fixed-size KV cache.
 
 In practice various gating and decay mechanisms mitigate the key collision/capacity issues.
@@ -72,7 +72,9 @@ The assocations become:
 
 To predict the blank, our hidden state x_7 is "dog", similar to x_1, which strengthens the v_2 representation for "barked".
 
-The shifted key hard prior fixes the symmetric memory matrix issue of linear attention normally solved by learned Q/K projections. Because the hidden state x_t is input to both the k_t, v_t vectors, the symmetric key-value pairs don't encode what comes next: e.g. the key might represent "I am the dog token" and value might represent "meaning of dog". Without the shifted key, our current hidden state is "dog", so when we query the matrix, we get "meaning of dog" back, when we actually wanted "meaning of bark".
+The shifted key hard prior fixes the linear attentions's symmetric memory matrix issue normally handled by learned Q/K projections.
+Because the hidden state x_t is input to both the k_t, v_t vectors, k_t and v_t encode the information for the same token, and not what comes next: e.g. the key might represent "I am the dog token" and value might represent "meaning of dog".
+Without the shifted key, querying with our current hidden state of "dog" returns "meaning of dog" back when we wanted the following "meaning of bark".
 
 This symmetry issue doesn't apply to softmax attention, which retains all previous keys to query against.
 
@@ -94,12 +96,12 @@ For the training losses with smoothed data points, we see the token shift perfor
 
 ![18M GDN Training Loss](eval_results/loss_curves_gdn_18M.png)
 
-However for transformers, the shifted key transformer performs worse. This suggests while softmax attention and linear attention derive from similar concepts, they do behave differently. While both are doing pattern matching, perhaps softmax attention does it through querying/recalling exact past keys, while linear attention does a fuzzier general pattern matching.
+However for transformers, the shifted key transformer performs worse. This suggests while softmax attention and linear attention derive from similar fundementals, they behave markedly different. While both are pattern matching, perhaps softmax attention queries/recalls exact past keys, while linear attention does a transitional general pattern matching.
 
 ![18M Transformer Training Loss](eval_results/loss_curves_transformer_18M.png)
 
 ### 100M Scale Testing
-We scale up to 105M for Gated Delta Net and 86.2M Shifted Key Gated Delta Net, trained for 300M tokens, batch size 1.
+We scale up to 105M parmaeters for Gated Delta Net and 86.2M Shifted Key Gated Delta Net, trained for 300M tokens, batch size 1.
 
 The shifted key model maintains a small lead despite ~15% fewer parameters, as well as faster convergence due to not needing to learn QK projections.
 
@@ -112,7 +114,7 @@ Lastly, the shifted key model seems to utilize its keys "better" for storing inf
 
 ![Key Quality Comparison](eval_results/key_quality.png)
 
-The shifted key model performs better on all metrics except condition number at layer 0, which is an artifact of adding a padding key since at position 0 there's no previous hidden state to use as the key.
+The shifted key model performs better on all metrics except condition number at layer 0, which is likely an artifact of adding a padding key since at position 0 there's no previous hidden state to use as the key.
 
 ## Conclusions
 I'm not exactly sure why this works. While it seems to make intuitive sense that associations can be chained together to form memory, it is confusing that restriction of only associating directly neighboring tokens doesn't impact performance more. Perhaps this is too restrictive at scale, although it does seem to demonstrate linear attention related models are genuinely different in some way.
